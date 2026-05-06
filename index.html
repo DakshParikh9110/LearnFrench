@@ -240,7 +240,7 @@
 
   .conj-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     border-bottom: 1px solid var(--line);
     padding: 6px 0;
@@ -252,6 +252,7 @@
     color: var(--pencil);
     width: 55px;
     flex-shrink: 0;
+    padding-top: 3px;
   }
 
   .answer-box {
@@ -556,6 +557,114 @@
     font-style: italic;
     padding-left: 4px;
     line-height: 1.2;
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    body { padding: 10px 8px 150px; }
+
+    /* Score badge — compact, stays out of the way */
+    #score-card {
+      top: 8px; right: 8px;
+      font-size: 14px; padding: 5px 10px;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    /* Trash — smaller, bottom right */
+    #trash-zone { bottom: 12px; right: 12px; }
+    .trash-can  { width: 42px; height: 50px; }
+    .trash-body { width: 42px; height: 50px; }
+    .trash-lid  { width: 50px; height: 9px; top: -9px; left: -4px; }
+    .trash-label { font-size: 9px; }
+
+    /* Header */
+    .header { margin-bottom: 12px; }
+    .header h1 { font-size: 32px; }
+    .header p  { font-size: 13px; }
+
+    /* Tabs: single scrollable row, no wrapping */
+    .tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      justify-content: flex-start;
+      gap: 6px;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { font-size: 14px; padding: 7px 13px; white-space: nowrap; flex-shrink: 0; }
+
+    /* Worksheet */
+    .worksheet-inner {
+      padding: 20px 12px 30px 40px;
+      background-size: 38px 100%, 100% 32px;
+    }
+    .hole { left: 12px; width: 13px; height: 13px; }
+    .hole:nth-child(1) { top: 60px; }
+    .hole:nth-child(2) { top: 200px; }
+    .hole:nth-child(3) { top: 340px; }
+
+    /* Verb header */
+    .verb-header { font-size: 22px; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+    .verb-tag    { font-size: 12px; }
+    .verb-phonetic { font-size: 13px; }
+    .hint-text   { font-size: 12px; margin-bottom: 10px; }
+    .section-title { font-size: 17px; }
+
+    /* ── KEY FIX: single column grid on mobile ── 
+       Two columns are too cramped for "ils/elles" + input + phonetic */
+    .conj-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+      margin-bottom: 20px;
+    }
+
+    /* Bigger tap targets for inputs */
+    .conj-row { padding: 10px 0; }
+    .pronoun  { font-size: 15px; width: 72px; padding-top: 4px; }
+    .answer-box { font-size: 17px; padding: 4px 6px; min-height: 32px; }
+    .form-phonetic { font-size: 10px; }
+    .check-icon { font-size: 15px; width: 18px; }
+
+    /* Buttons — big tap targets */
+    .btn-row { gap: 8px; margin-top: 14px; }
+    .btn {
+      flex: 1;
+      text-align: center;
+      font-size: 15px;
+      padding: 13px 8px;
+      min-height: 48px; /* Apple HIG minimum tap target */
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    /* Nav */
+    .nav-row { margin-bottom: 12px; }
+    .nav-row .btn { flex: none; padding: 10px 14px; min-height: 44px; font-size: 15px; }
+    .progress { font-size: 14px; }
+
+    /* Reference tab — stack exception cards in 1 col, keep tables scrollable */
+    .ref-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ref-table { font-size: 14px; min-width: 340px; }
+    .ref-table th { font-size: 10px; padding: 3px 4px 5px; }
+    .ref-table td { padding: 5px 4px; }
+    .ref-section-title { font-size: 19px; }
+    .ref-note { font-size: 13px; }
+    .ref-exceptions-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ref-exc-card { padding: 8px; }
+    .ref-exc-card .verb-name { font-size: 16px; }
+    .ref-exc-row  { font-size: 13px; }
+    .ref-callout  { font-size: 13px; padding: 8px 12px; }
+
+    .result-flash { font-size: 60px; }
+  }
+
+  /* Extra small phones (SE, Galaxy A) */
+  @media (max-width: 380px) {
+    .ref-exceptions-grid { grid-template-columns: 1fr; }
+    .btn { font-size: 14px; padding: 12px 6px; }
+    .verb-header { font-size: 20px; }
   }
 </style>
 </head>
@@ -943,12 +1052,12 @@ function renderReference() {
         </tr>`;
       });
     });
-    return `<table class="ref-table">
+    return `<div class="ref-table-wrap"><table class="ref-table">
       <thead><tr>
         <th>Pronoun</th><th>stem + ending</th><th>result</th><th>${example.verb} (${exampleMeaning})</th>
       </tr></thead>
       <tbody>${rows}</tbody>
-    </table>`;
+    </table></div>`;
   }
 
   const exceptions = [

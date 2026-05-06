@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>French Conjugation Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fdfbf0;
+    --line: #b8d4f0;
+    --ink: #1a1a2e;
+    --red: #e63946;
+    --green: #2d6a4f;
+    --pencil: #4a4e69;
+    --accent: #f4a261;
+    --margin: #f4b8b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #c8d5b9;
+    background-image: 
+      repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 80px);
+    min-height: 100vh;
+    font-family: 'Patrick Hand', cursive;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px 100px;
+    position: relative;
+  }
+
+  /* TRASH CAN */
+  #trash-zone {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .trash-can {
+    width: 60px;
+    height: 70px;
+    position: relative;
+  }
+
+  .trash-lid {
+    width: 70px;
+    height: 12px;
+    background: #555;
+    border-radius: 4px 4px 0 0;
+    position: absolute;
+    top: -12px;
+    left: -5px;
+    transition: transform 0.2s;
+    transform-origin: right center;
+  }
+
+  .trash-can.open .trash-lid {
+    transform: rotate(-40deg);
+  }
+
+  .trash-body {
+    width: 60px;
+    height: 70px;
+    background: linear-gradient(135deg, #666, #444);
+    border-radius: 0 0 8px 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .trash-body::before {
+    content: '';
+    position: absolute;
+    left: 15px; top: 10px;
+    width: 6px; height: 50px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+  }
+  .trash-body::after {
+    content: '';
+    position: absolute;
+    left: 28px; top: 10px;
+    width: 6px; height: 50px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+  }
+
+  .trash-label {
+    font-family: 'Caveat', cursive;
+    font-size: 11px;
+    color: #555;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  /* SCORE */
+  #score-card {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    box-shadow: 3px 3px 0 var(--ink);
+    z-index: 100;
+  }
+
+  #score-card span { color: var(--green); font-weight: 700; }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .header h1 {
+    font-family: 'Caveat', cursive;
+    font-size: 52px;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -1px;
+    position: relative;
+    display: inline-block;
+  }
+
+  .header h1::after {
+    content: '';
+    display: block;
+    height: 4px;
+    background: var(--red);
+    border-radius: 2px;
+    margin-top: 4px;
+    transform: rotate(-1deg);
+  }
+
+  .header p {
+    color: var(--pencil);
+    margin-top: 8px;
+    font-size: 17px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tab {
+    padding: 8px 18px;
+    border: 2px solid var(--ink);
+    border-radius: 20px;
+    background: var(--paper);
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  .tab:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .tab.active { background: var(--ink); color: var(--paper); transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+
+  /* WORKSHEET */
+  .worksheet {
+    background: var(--paper);
+    width: 100%;
+    max-width: 720px;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Notebook lines */
+  .worksheet-inner {
+    padding: 40px 50px 50px 80px;
+    background-image: 
+      linear-gradient(var(--margin) 0px, var(--margin) 1px, transparent 1px),
+      repeating-linear-gradient(transparent, transparent 31px, var(--line) 31px, var(--line) 32px);
+    background-size: 70px 100%, 100% 32px;
+    background-position: 0 0, 0 8px;
+    min-height: 400px;
+  }
+
+  /* Holes */
+  .hole { position: absolute; left: 28px; width: 18px; height: 18px; border-radius: 50%; background: #c8d5b9; border: 2px solid #aaa; }
+  .hole:nth-child(1) { top: 80px; }
+  .hole:nth-child(2) { top: 240px; }
+  .hole:nth-child(3) { top: 400px; }
+
+  /* VERB CARD */
+  .verb-header {
+    font-family: 'Caveat', cursive;
+    font-size: 30px;
+    color: var(--ink);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .verb-tag {
+    font-size: 14px;
+    background: var(--accent);
+    color: var(--ink);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-family: 'Patrick Hand', cursive;
+    vertical-align: middle;
+  }
+
+  .verb-meaning {
+    font-size: 15px;
+    color: var(--pencil);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  /* CONJUGATION TABLE */
+  .conj-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 30px;
+    margin-bottom: 30px;
+  }
+
+  .conj-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--line);
+    padding: 6px 0;
+  }
+
+  .pronoun {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--pencil);
+    width: 55px;
+    flex-shrink: 0;
+  }
+
+  .answer-box {
+    flex: 1;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid #ccc;
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: var(--ink);
+    outline: none;
+    padding: 2px 4px;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .answer-box:focus { border-bottom-color: var(--accent); }
+  .answer-box.correct { border-bottom-color: var(--green); color: var(--green); }
+  .answer-box.wrong { border-bottom-color: var(--red); color: var(--red); animation: shake 0.3s; }
+  .answer-box.revealed { color: var(--pencil); border-bottom-style: dashed; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .check-icon {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 10px 22px;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    font-family: 'Caveat', cursive;
+    font-size: 19px;
+    cursor: pointer;
+    background: var(--paper);
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: all 0.12s;
+  }
+
+  .btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
+  .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn.danger { background: var(--red); color: white; border-color: var(--red); box-shadow: 3px 3px 0 #8b1c26; }
+
+  /* NAVIGATION */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .progress {
+    font-family: 'Caveat', cursive;
+    font-size: 17px;
+    color: var(--pencil);
+  }
+
+  /* PAPER BALL ANIMATION */
+  #paper-ball {
+    position: fixed;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff9e6, #e8dfc0);
+    border: 1px solid #c9b99a;
+    display: none;
+    z-index: 999;
+    pointer-events: none;
+    box-shadow: inset -3px -3px 6px rgba(0,0,0,0.15), 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* crumple lines */
+  #paper-ball::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: 
+      linear-gradient(45deg, transparent 40%, rgba(0,0,0,0.07) 41%, transparent 42%),
+      linear-gradient(135deg, transparent 30%, rgba(0,0,0,0.05) 31%, transparent 32%),
+      linear-gradient(70deg, transparent 55%, rgba(0,0,0,0.06) 56%, transparent 57%);
+  }
+
+  @keyframes throwBall {
+    0% { opacity: 1; transform: scale(1) rotate(0deg); }
+    40% { opacity: 1; transform: scale(0.9) rotate(200deg); }
+    80% { opacity: 1; transform: scale(0.6) rotate(500deg); }
+    100% { opacity: 0; transform: scale(0.3) rotate(720deg); }
+  }
+
+  /* CONFETTI */
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+    z-index: 1000;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(200px) rotate(720deg); }
+  }
+
+  /* RESULT FLASH */
+  .result-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Caveat', cursive;
+    font-size: 60px;
+    pointer-events: none;
+    z-index: 998;
+    animation: flashOut 1s forwards;
+  }
+
+  @keyframes flashOut {
+    0% { opacity: 1; transform: translate(-50%,-50%) scale(0.5); }
+    30% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+    70% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-60%) scale(0.9); }
+  }
+
+  .ref-tab { border-color: var(--green); color: var(--green); }
+  .ref-tab.active { background: var(--green); color: var(--paper); }
+
+  /* REFERENCE TAB */
+  .ref-section { margin-bottom: 32px; }
+  .ref-section-title {
+    font-family: 'Caveat', cursive;
+    font-size: 26px;
+    color: var(--ink);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ref-badge {
+    font-size: 13px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-family: 'Patrick Hand', cursive;
+  }
+  .ref-note {
+    font-size: 14px;
+    color: var(--pencil);
+    font-style: italic;
+    margin-bottom: 14px;
+    padding-left: 2px;
+  }
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Caveat', cursive;
+    font-size: 19px;
+  }
+  .ref-table th {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pencil);
+    text-align: left;
+    padding: 4px 8px 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .ref-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-pronoun { color: var(--pencil); font-size: 17px; }
+  .ref-stem { color: var(--pencil); }
+  .ref-ending {
+    font-weight: 700;
+    color: var(--red);
+  }
+  .ref-full { color: var(--ink); }
+  .ref-example { color: var(--pencil); font-size: 16px; font-style: italic; }
+  .ref-divider {
+    border: none;
+    border-top: 2px dashed var(--line);
+    margin: 28px 0;
+  }
+  .ref-callout {
+    background: #fff8e1;
+    border-left: 4px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 15px;
+    color: var(--ink);
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+  .ref-exceptions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+    margin-top: 10px;
+  }
+  .ref-exc-card {
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fff;
+  }
+  .ref-exc-card .verb-name {
+    font-family: 'Caveat', cursive;
+    font-size: 21px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+  }
+  .ref-exc-card .verb-name span {
+    font-size: 13px;
+    color: var(--pencil);
+    font-family: 'Patrick Hand', cursive;
+    font-style: italic;
+    margin-left: 6px;
+  }
+  .ref-exc-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Caveat', cursive;
+    font-size: 16px;
+    padding: 2px 0;
+    border-bottom: 1px dotted #eee;
+  }
+  .ref-exc-row:last-child { border-bottom: none; }
+  .ref-exc-row .ep { color: var(--pencil); font-size: 14px; }
+  .ref-exc-row .ef { color: var(--ink); font-weight: 600; }
+  .section-title {
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    color: var(--red);
+    margin-bottom: 16px;
+    border-bottom: 2px dashed var(--red);
+    padding-bottom: 4px;
+    display: inline-block;
+  }
+
+  /* HINT */
+  .hint-text {
+    font-size: 14px;
+    color: var(--pencil);
+    margin-top: -10px;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  /* ALL DONE */
+  .all-done {
+    text-align: center;
+    padding: 40px;
+    font-family: 'Caveat', cursive;
+  }
+  .all-done h2 { font-size: 42px; color: var(--green); }
+  .all-done p { font-size: 22px; color: var(--pencil); margin-top: 10px; }
+
+  .verb-phonetic {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 16px;
+    color: var(--pencil);
+    font-style: italic;
+    margin-left: 4px;
+  }
+
+  .input-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .form-phonetic {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 11px;
+    color: var(--pencil);
+    font-style: italic;
+    padding-left: 4px;
+    line-height: 1.2;
+  }
+</style>
+</head>
+<body>
+
+<!-- Score -->
+<div id="score-card">🎯 Score: <span id="score-display">0</span></div>
+
+<!-- Trash can -->
+<div id="trash-zone">
+  <div class="trash-can" id="trash-can">
+    <div class="trash-lid"></div>
+    <div class="trash-body"></div>
+  </div>
+  <div class="trash-label">corbeille</div>
+</div>
+
+<!-- Paper ball (animated) -->
+<div id="paper-ball"></div>
+
+<!-- Header -->
+<div class="header">
+  <h1>French Conjugation</h1>
+  <p>Présent de l'indicatif — fill in the blanks, nail the throw 🏀</p>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="switchCategory('er')">-ER verbs</button>
+  <button class="tab" onclick="switchCategory('ir')">-IR verbs</button>
+  <button class="tab" onclick="switchCategory('re')">-RE & other</button>
+  <button class="tab" onclick="switchCategory('exceptions')">Exceptions</button>
+  <button class="tab ref-tab" onclick="switchCategory('reference')">📖 Reference</button>
+</div>
+
+<!-- Worksheet -->
+<div class="worksheet">
+  <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+  <div class="worksheet-inner">
+    <div id="ws-content"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+// forms order: [je, tu, il/elle, nous, vous, ils/elles]
+// phonetics order: same
+const VERBS = {
+  er: [
+    { verb: 'parler', phonetic: 'par-LAY', meaning: 'to speak',
+      forms:    ['parle',    'parles',    'parle',    'parlons',     'parlez',     'parlent'],
+      phonetics:['PARL',     'PARL',      'PARL',     'par-LON',     'par-LAY',    'PARL'] },
+    { verb: 'aimer', phonetic: 'ay-MAY', meaning: 'to love / like',
+      forms:    ['aime',     'aimes',     'aime',     'aimons',      'aimez',      'aiment'],
+      phonetics:['EM',       'EM',        'EM',        'ay-MON',      'ay-MAY',     'EM'] },
+    { verb: 'travailler', phonetic: 'tra-va-YAY', meaning: 'to work',
+      forms:    ['travaille',    'travailles',    'travaille',    'travaillons',      'travaillez',      'travaillent'],
+      phonetics:['tra-VYE',      'tra-VYE',       'tra-VYE',      'tra-va-YON',       'tra-va-YAY',      'tra-VYE'] },
+    { verb: 'habiter', phonetic: 'a-bee-TAY', meaning: 'to live (somewhere)',
+      forms:    ['habite',    'habites',    'habite',    'habitons',     'habitez',     'habitent'],
+      phonetics:['a-BEET',    'a-BEET',     'a-BEET',    'a-bee-TON',    'a-bee-TAY',   'a-BEET'] },
+    { verb: 'écouter', phonetic: 'ay-koo-TAY', meaning: 'to listen',
+      forms:    ['écoute',    'écoutes',    'écoute',    'écoutons',      'écoutez',      'écoutent'],
+      phonetics:['ay-KOOT',   'ay-KOOT',    'ay-KOOT',   'ay-koo-TON',    'ay-koo-TAY',   'ay-KOOT'] },
+    { verb: 'manger', phonetic: 'mon-ZHAY', meaning: 'to eat',
+      forms:    ['mange',    'manges',    'mange',    'mangeons',     'mangez',     'mangent'],
+      phonetics:['MONZH',    'MONZH',     'MONZH',    'mon-ZHON',     'mon-ZHAY',   'MONZH'],
+      note: 'Spelling: mang- → mange- before -ons to keep the soft G sound' },
+  ],
+  ir: [
+    { verb: 'finir', phonetic: 'fee-NEER', meaning: 'to finish',
+      forms:    ['finis',    'finis',    'finit',    'finissons',      'finissez',      'finissent'],
+      phonetics:['fee-NEE',  'fee-NEE',  'fee-NEE',  'fee-nee-SON',    'fee-nee-SAY',   'fee-NEES'] },
+    { verb: 'choisir', phonetic: 'shwa-ZEER', meaning: 'to choose',
+      forms:    ['choisis',    'choisis',    'choisit',    'choisissons',       'choisissez',       'choisissent'],
+      phonetics:['shwa-ZEE',   'shwa-ZEE',   'shwa-ZEE',   'shwa-zee-SON',      'shwa-zee-SAY',     'shwa-ZEES'] },
+    { verb: 'réussir', phonetic: 'ray-oo-SEER', meaning: 'to succeed',
+      forms:    ['réussis',    'réussis',    'réussit',    'réussissons',        'réussissez',        'réussissent'],
+      phonetics:['ray-oo-SEE', 'ray-oo-SEE', 'ray-oo-SEE', 'ray-oo-see-SON',    'ray-oo-see-SAY',   'ray-oo-SEES'] },
+    { verb: 'grandir', phonetic: 'gron-DEER', meaning: 'to grow (up)',
+      forms:    ['grandis',    'grandis',    'grandit',    'grandissons',        'grandissez',        'grandissent'],
+      phonetics:['gron-DEE',   'gron-DEE',   'gron-DEE',   'gron-dee-SON',      'gron-dee-SAY',     'gron-DEES'] },
+    { verb: 'rougir', phonetic: 'roo-ZHEER', meaning: 'to blush / turn red',
+      forms:    ['rougis',    'rougis',    'rougit',    'rougissons',       'rougissez',       'rougissent'],
+      phonetics:['roo-ZHEE',  'roo-ZHEE',  'roo-ZHEE',  'roo-zhee-SON',    'roo-zhee-SAY',   'roo-ZHEES'] },
+  ],
+  re: [
+    { verb: 'vendre', phonetic: 'VON-druh', meaning: 'to sell',
+      forms:    ['vends',   'vends',   'vend',   'vendons',    'vendez',    'vendent'],
+      phonetics:['VON',     'VON',     'VON',    'von-DON',    'von-DAY',   'VON-duh'] },
+    { verb: 'attendre', phonetic: 'a-TON-druh', meaning: 'to wait',
+      forms:    ['attends',   'attends',   'attend',   'attendons',    'attendez',    'attendent'],
+      phonetics:['a-TON',     'a-TON',     'a-TON',    'a-ton-DON',    'a-ton-DAY',   'a-TON-duh'] },
+    { verb: 'répondre', phonetic: 'ray-PON-druh', meaning: 'to answer',
+      forms:    ['réponds',    'réponds',    'répond',    'répondons',     'répondez',     'répondent'],
+      phonetics:['ray-PON',    'ray-PON',    'ray-PON',   'ray-pon-DON',   'ray-pon-DAY',  'ray-PON-duh'] },
+    { verb: 'entendre', phonetic: 'on-TON-druh', meaning: 'to hear',
+      forms:    ['entends',   'entends',   'entend',   'entendons',     'entendez',     'entendent'],
+      phonetics:['on-TON',    'on-TON',    'on-TON',   'on-ton-DON',    'on-ton-DAY',   'on-TON-duh'] },
+    { verb: 'perdre', phonetic: 'PAIR-druh', meaning: 'to lose',
+      forms:    ['perds',    'perds',    'perd',    'perdons',    'perdez',    'perdent'],
+      phonetics:['PAIR',     'PAIR',     'PAIR',    'pair-DON',   'pair-DAY',  'PAIR-duh'] },
+  ],
+  exceptions: [
+    { verb: 'être', phonetic: 'ET-ruh', meaning: 'to be',
+      forms:    ['suis',  'es',   'est',  'sommes',   'êtes',    'sont'],
+      phonetics:['SWEE',  'AY',   'AY',   'SOM',      'ET',      'SON'],
+      note: '⭐ Most important verb — used everywhere' },
+    { verb: 'avoir', phonetic: 'a-VWAR', meaning: 'to have',
+      forms:    ['ai',   'as',   'a',    'avons',    'avez',    'ont'],
+      phonetics:['AY',   'AH',   'AH',   'a-VON',    'a-VAY',   'ON'],
+      note: '⭐ Needed for passé composé and many expressions' },
+    { verb: 'aller', phonetic: 'a-LAY', meaning: 'to go',
+      forms:    ['vais',  'vas',  'va',   'allons',   'allez',   'vont'],
+      phonetics:['VAY',   'VAH',  'VAH',  'a-LON',    'a-LAY',   'VON'],
+      note: '⚠️ Ends in -ER but is completely irregular' },
+    { verb: 'faire', phonetic: 'FAIR', meaning: 'to do / make',
+      forms:    ['fais',  'fais',  'fait',  'faisons',   'faites',   'font'],
+      phonetics:['FAY',   'FAY',   'FAY',   'fuh-ZON',   'FET',      'FON'],
+      note: 'vous faites is irregular — not *faisez' },
+    { verb: 'partir', phonetic: 'par-TEER', meaning: 'to leave',
+      forms:    ['pars',  'pars',  'part',  'partons',   'partez',   'partent'],
+      phonetics:['PAR',   'PAR',   'PAR',   'par-TON',   'par-TAY',  'PAR-tuh'],
+      note: 'Irregular -IR: stem drops to par-, no -iss- in plural' },
+    { verb: 'venir', phonetic: 'vuh-NEER', meaning: 'to come',
+      forms:    ['viens',   'viens',   'vient',   'venons',   'venez',   'viennent'],
+      phonetics:['VYEN',    'VYEN',    'VYEN',    'vuh-NON',  'vuh-NAY', 'VYEN'],
+      note: 'Stem change: vien- (singular) → ven- (nous/vous) → vienn- (ils)' },
+    { verb: 'pouvoir', phonetic: 'poo-VWAR', meaning: 'can / to be able',
+      forms:    ['peux',   'peux',   'peut',   'pouvons',    'pouvez',    'peuvent'],
+      phonetics:['PUH',    'PUH',    'PUH',    'poo-VON',    'poo-VAY',   'PUH-vuh'] },
+    { verb: 'vouloir', phonetic: 'voo-LWAR', meaning: 'to want',
+      forms:    ['veux',   'veux',   'veut',   'voulons',    'voulez',    'veulent'],
+      phonetics:['VUH',    'VUH',    'VUH',    'voo-LON',    'voo-LAY',   'VUH-luh'] },
+    { verb: 'savoir', phonetic: 'sa-VWAR', meaning: 'to know (a fact)',
+      forms:    ['sais',   'sais',   'sait',   'savons',    'savez',    'savent'],
+      phonetics:['SAY',    'SAY',    'SAY',    'sa-VON',    'sa-VAY',   'SAV'] },
+    { verb: 'devoir', phonetic: 'duh-VWAR', meaning: 'must / to have to',
+      forms:    ['dois',   'dois',   'doit',   'devons',    'devez',    'doivent'],
+      phonetics:['DWAH',   'DWAH',   'DWAH',   'duh-VON',   'duh-VAY',  'DWAHV'] },
+    { verb: 'prendre', phonetic: 'PRON-druh', meaning: 'to take',
+      forms:    ['prends',   'prends',   'prend',   'prenons',   'prenez',   'prennent'],
+      phonetics:['PRON',     'PRON',     'PRON',    'pruh-NON',  'pruh-NAY', 'PREN'],
+      note: 'Stem change: prend- → pren- (nous/vous) → prenn- (ils)' },
+    { verb: 'mettre', phonetic: 'MET-ruh', meaning: 'to put',
+      forms:    ['mets',   'mets',   'met',   'mettons',   'mettez',   'mettent'],
+      phonetics:['MAY',    'MAY',    'MAY',   'may-TON',   'may-TAY',  'MET'] },
+  ]
+};
+
+const PRONOUNS = ['je','tu','il/elle','nous','vous','ils/elles'];
+
+// ─── STATE ─────────────────────────────────────────────────────────────────────
+let currentCategory = 'er';
+let currentVerbIdx = 0;
+let score = 0;
+let verbStates = {}; // { verbKey: { checked: bool[], correct: bool[], values: str[] } }
+
+function verbKey(cat, idx) { return `${cat}_${idx}`; }
+
+function getState(cat, idx) {
+  const k = verbKey(cat, idx);
+  if (!verbStates[k]) {
+    verbStates[k] = {
+      checked: Array(6).fill(false),
+      correct: Array(6).fill(false),
+      values: Array(6).fill(''),
+      revealed: Array(6).fill(false)
+    };
+  }
+  return verbStates[k];
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────────
+function render() {
+  const verbs = VERBS[currentCategory];
+  const verb = verbs[currentVerbIdx];
+  const state = getState(currentCategory, currentVerbIdx);
+
+  let html = `
+    <div class="nav-row">
+      <button class="btn" onclick="prevVerb()">← Prev</button>
+      <span class="progress">${currentVerbIdx + 1} / ${verbs.length}</span>
+      <button class="btn" onclick="nextVerb()">Next →</button>
+    </div>
+    <div class="section-title">${currentCategory === 'exceptions' ? 'Irregular verbs' : currentCategory.toUpperCase() + ' verbs'} — présent</div>
+    <div class="verb-header">
+      ${verb.verb} <span class="verb-phonetic">/${verb.phonetic}/</span> <span class="verb-tag">${verb.meaning}</span>
+    </div>
+    ${verb.note ? `<div class="hint-text">💡 ${verb.note}</div>` : '<div style="height:16px"></div>'}
+    <div class="conj-grid">
+  `;
+
+  const pairs = [[0,3],[1,4],[2,5]];
+  pairs.forEach(([left, right]) => {
+    [left, right].forEach(i => {
+      const s = state;
+      const isCorrect = s.correct[i];
+      const isChecked = s.checked[i];
+      const isRevealed = s.revealed[i];
+      const val = s.values[i];
+
+      let cls = '';
+      let icon = '';
+      if (isRevealed) { cls = 'revealed'; icon = '👁️'; }
+      else if (isChecked && isCorrect) { cls = 'correct'; icon = '✓'; }
+      else if (isChecked && !isCorrect) { cls = 'wrong'; icon = '✗'; }
+
+      html += `
+        <div class="conj-row">
+          <span class="pronoun">${PRONOUNS[i]}</span>
+          <div class="input-wrap">
+            <input 
+              class="answer-box ${cls}"
+              id="inp_${i}"
+              data-idx="${i}"
+              value="${isRevealed ? verb.forms[i] : val}"
+              ${isCorrect || isRevealed ? 'readonly' : ''}
+              placeholder="..."
+              onkeydown="handleKey(event, ${i})"
+              oninput="saveVal(${i}, this.value)"
+              autocomplete="off" autocorrect="off" spellcheck="false"
+            />
+            ${(isCorrect || isRevealed) && verb.phonetics ? `<span class="form-phonetic">/${verb.phonetics[i]}/</span>` : ''}
+          </div>
+          <span class="check-icon">${icon}</span>
+        </div>
+      `;
+    });
+  });
+
+  html += `</div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="checkAll()">✓ Check All</button>
+      <button class="btn" onclick="revealAll()">👁 Reveal</button>
+      <button class="btn" onclick="resetVerb()">↺ Reset</button>
+    </div>
+  `;
+
+  document.getElementById('ws-content').innerHTML = html;
+
+  // Focus first empty
+  for (let i = 0; i < 6; i++) {
+    const s = state;
+    if (!s.correct[i] && !s.revealed[i]) {
+      const el = document.getElementById(`inp_${i}`);
+      if (el) { el.focus(); break; }
+    }
+  }
+}
+
+function saveVal(i, val) {
+  const state = getState(currentCategory, currentVerbIdx);
+  state.values[i] = val;
+}
+
+function handleKey(e, i) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    checkSingle(i);
+  }
+  if (e.key === 'Tab') {
+    // natural tab, just let it go
+  }
+}
+
+function checkSingle(i) {
+  const verb = VERBS[currentCategory][currentVerbIdx];
+  const state = getState(currentCategory, currentVerbIdx);
+  const inp = document.getElementById(`inp_${i}`);
+  if (!inp || state.correct[i] || state.revealed[i]) return;
+
+  const val = inp.value.trim().toLowerCase();
+  const correct = verb.forms[i].toLowerCase();
+  state.values[i] = inp.value;
+  state.checked[i] = true;
+
+  if (val === correct) {
+    state.correct[i] = true;
+    score++;
+    updateScore();
+    inp.classList.remove('wrong');
+    inp.classList.add('correct');
+    inp.readOnly = true;
+    document.querySelector(`#inp_${i} + .check-icon`) // won't work inline, update icon another way
+    render(); // re-render to show icon
+    throwBall(); // 🏀
+    checkAllCorrect();
+  } else {
+    state.correct[i] = false;
+    inp.classList.remove('correct');
+    inp.classList.add('wrong');
+    render();
+  }
+}
+
+function checkAll() {
+  const verb = VERBS[currentCategory][currentVerbIdx];
+  const state = getState(currentCategory, currentVerbIdx);
+  let anyCorrect = false;
+
+  for (let i = 0; i < 6; i++) {
+    if (state.correct[i] || state.revealed[i]) continue;
+    const inp = document.getElementById(`inp_${i}`);
+    if (!inp) continue;
+    const val = (inp.value || state.values[i]).trim().toLowerCase();
+    const correct = verb.forms[i].toLowerCase();
+    state.values[i] = inp.value;
+    state.checked[i] = true;
+
+    if (val === correct) {
+      state.correct[i] = true;
+      score++;
+      anyCorrect = true;
+    }
+  }
+
+  updateScore();
+  render();
+
+  if (anyCorrect) throwBall();
+  checkAllCorrect();
+}
+
+function revealAll() {
+  const state = getState(currentCategory, currentVerbIdx);
+  for (let i = 0; i < 6; i++) {
+    if (!state.correct[i]) state.revealed[i] = true;
+  }
+  render();
+}
+
+function resetVerb() {
+  const k = verbKey(currentCategory, currentVerbIdx);
+  delete verbStates[k];
+  render();
+}
+
+function prevVerb() {
+  if (currentCategory === 'reference') return;
+  const verbs = VERBS[currentCategory];
+  currentVerbIdx = (currentVerbIdx - 1 + verbs.length) % verbs.length;
+  render();
+}
+
+function nextVerb() {
+  if (currentCategory === 'reference') return;
+  const verbs = VERBS[currentCategory];
+  currentVerbIdx = (currentVerbIdx + 1) % verbs.length;
+  render();
+}
+
+function switchCategory(cat) {
+  currentCategory = cat;
+  currentVerbIdx = 0;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  if (cat === 'reference') renderReference();
+  else render();
+}
+
+function renderReference() {
+  // Order: je(0), tu(1), il(2), nous(3), vous(4), ils(5)
+  // Display pairs: [je/nous], [tu/vous], [il/ils]
+  const pairOrder = [[0,3],[1,4],[2,5]];
+  const pronouns = ['je / j\'','tu','il / elle','nous','vous','ils / elles'];
+  const shortP   = ['je','tu','il/elle','nous','vous','ils/elles'];
+
+  // endings indexed same as forms: [je,tu,il,nous,vous,ils]
+  const erEndings = ['-e','-es','-e','-ons','-ez','-ent'];
+  const irEndings = ['-is','-is','-it','-issons','-issez','-issent'];
+  const reEndings = ['-s','-s','—','-ons','-ez','-ent'];
+
+  function endingTable(stem, endings, example, exampleMeaning) {
+    let rows = '';
+    pairOrder.forEach(([l, r]) => {
+      [l, r].forEach(i => {
+        const ending = endings[i];
+        const full = stem + (ending === '—' ? '' : ending.replace('-',''));
+        rows += `<tr>
+          <td class="ref-pronoun">${pronouns[i]}</td>
+          <td><span class="ref-stem">${stem}</span><span class="ref-ending">${ending}</span></td>
+          <td class="ref-full">${full}</td>
+          <td class="ref-example">${example.forms[i]}</td>
+        </tr>`;
+      });
+    });
+    return `<table class="ref-table">
+      <thead><tr>
+        <th>Pronoun</th><th>stem + ending</th><th>result</th><th>${example.verb} (${exampleMeaning})</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  const exceptions = [
+    { verb:'être',   meaning:'to be',      forms:['suis','es','est','sommes','êtes','sont'] },
+    { verb:'avoir',  meaning:'to have',    forms:['ai','as','a','avons','avez','ont'] },
+    { verb:'faire',  meaning:'to do/make', forms:['fais','fais','fait','faisons','faites','font'] },
+    { verb:'aller',  meaning:'to go',      forms:['vais','vas','va','allons','allez','vont'] },
+    { verb:'pouvoir',meaning:'can',        forms:['peux','peux','peut','pouvons','pouvez','peuvent'] },
+    { verb:'vouloir',meaning:'to want',    forms:['veux','veux','veut','voulons','voulez','veulent'] },
+    { verb:'savoir', meaning:'to know',    forms:['sais','sais','sait','savons','savez','savent'] },
+    { verb:'devoir', meaning:'must',       forms:['dois','dois','doit','devons','devez','doivent'] },
+  ];
+
+  let excCards = exceptions.map(e => `
+    <div class="ref-exc-card">
+      <div class="verb-name">${e.verb} <span>${e.meaning}</span></div>
+      ${pairOrder.map(([l,r]) => `
+        <div class="ref-exc-row"><span class="ep">${shortP[l]}</span><span class="ef">${e.forms[l]}</span></div>
+        <div class="ref-exc-row"><span class="ep">${shortP[r]}</span><span class="ef">${e.forms[r]}</span></div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  document.getElementById('ws-content').innerHTML = `
+    <div class="section-title">📖 Conjugation Reference</div>
+    <div style="height:10px"></div>
+
+    <div class="ref-section">
+      <div class="ref-section-title">-ER verbs <span class="ref-badge">most common</span></div>
+      <div class="ref-note">Drop the -er → add endings. ~90% of French verbs follow this.</div>
+      ${endingTable('parl', erEndings, {verb:'parler', forms:['parle','parles','parle','parlons','parlez','parlent']}, 'to speak')}
+      <div class="ref-callout">
+        ⚠️ <strong>Spelling tweaks:</strong> verbs ending in <em>-ger</em> (manger) → add <strong>e</strong> before <em>-ons</em>: <em>mang<strong>e</strong>ons</em>. 
+        Verbs in <em>-cer</em> (commencer) → ç before <em>-ons</em>: <em>commen<strong>ç</strong>ons</em>.
+      </div>
+    </div>
+
+    <hr class="ref-divider">
+
+    <div class="ref-section">
+      <div class="ref-section-title">-IR verbs (regular) <span class="ref-badge">2nd group</span></div>
+      <div class="ref-note">Drop the -ir → add -iss- in plural, then endings. Think: finir, choisir, réussir.</div>
+      ${endingTable('fin', irEndings, {verb:'finir', forms:['finis','finis','finit','finissons','finissez','finissent']}, 'to finish')}
+      <div class="ref-callout">
+        💡 The <strong>-iss-</strong> in nous/vous/ils is the key giveaway of a regular -IR verb. Irregular -IR verbs (partir, sortir, venir) do <em>not</em> get -iss- — they use the shorter endings below:<br><br>
+        <strong>Irregular -IR (partir/sortir pattern):</strong> par<strong>s</strong>, par<strong>s</strong>, par<strong>t</strong>, par<strong>tons</strong>, par<strong>tez</strong>, par<strong>tent</strong> — stem loses the consonant before -ir.
+      </div>
+    </div>
+
+    <hr class="ref-divider">
+
+    <div class="ref-section">
+      <div class="ref-section-title">-RE verbs <span class="ref-badge">3rd group</span></div>
+      <div class="ref-note">Drop the -re → add endings. Note: il/elle gets NO ending (just the stem).</div>
+      ${endingTable('vend', reEndings, {verb:'vendre', forms:['vends','vends','vend','vendons','vendez','vendent']}, 'to sell')}
+      <div class="ref-callout">
+        ⚠️ <strong>il/elle vend</strong> — no ending at all! The bare stem is the form. Don't add a -t.<br>
+        🔀 <strong>prendre</strong> is a common -RE verb with a stem change: nous pre<strong>n</strong>ons → ils pre<strong>nn</strong>ent.
+      </div>
+    </div>
+
+    <hr class="ref-divider">
+
+    <div class="ref-section">
+      <div class="ref-section-title">Irregular verbs <span class="ref-badge">memorize these!</span></div>
+      <div class="ref-note">These don't follow any pattern — just learn them cold. They're also the most used verbs in French.</div>
+      <div class="ref-exceptions-grid">${excCards}</div>
+      <div class="ref-callout" style="margin-top:16px">
+        🧠 <strong>Priority order to memorize:</strong> être → avoir → aller → faire → pouvoir → vouloir → savoir → devoir.<br>
+        These 8 verbs appear in literally every conversation.
+      </div>
+    </div>
+  `;
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent = score;
+}
+
+function checkAllCorrect() {
+  const state = getState(currentCategory, currentVerbIdx);
+  const allDone = state.correct.every(Boolean) || state.correct.map((c,i) => c || state.revealed[i]).every(Boolean);
+  if (state.correct.every(Boolean)) {
+    setTimeout(() => {
+      showFlash('🥳 Parfait!');
+    }, 400);
+  }
+}
+
+// ─── PAPER BALL ANIMATION ─────────────────────────────────────────────────────
+
+function throwBall() {
+  const ball = document.getElementById('paper-ball');
+  const trash = document.getElementById('trash-zone');
+  const trashRect = trash.getBoundingClientRect();
+  const trashCan = document.getElementById('trash-can');
+
+  // Start from somewhere near center-top of screen
+  const startX = window.innerWidth / 2 - 18;
+  const startY = window.innerHeight / 2 - 18;
+  const endX = trashRect.left + trashRect.width / 2 - 18;
+  const endY = trashRect.top + 10;
+
+  ball.style.display = 'block';
+  ball.style.left = startX + 'px';
+  ball.style.top = startY + 'px';
+  ball.style.animation = 'none';
+  ball.style.opacity = '1';
+  ball.style.transform = 'scale(1) rotate(0deg)';
+
+  // Animate via JS for arc trajectory
+  const duration = 700;
+  const startTime = performance.now();
+
+  // Arc control point
+  const cpX = (startX + endX) / 2 + (Math.random() - 0.5) * 200;
+  const cpY = Math.min(startY, endY) - 200 - Math.random() * 100;
+
+  trashCan.classList.add('open');
+
+  function animFrame(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+
+    // Quadratic bezier
+    const x = (1-t)*(1-t)*startX + 2*(1-t)*t*cpX + t*t*endX;
+    const y = (1-t)*(1-t)*startY + 2*(1-t)*t*cpY + t*t*endY;
+    const scale = 1 - t * 0.5;
+    const rot = t * 720;
+
+    ball.style.left = x + 'px';
+    ball.style.top = y + 'px';
+    ball.style.transform = `scale(${scale}) rotate(${rot}deg)`;
+    ball.style.opacity = t > 0.85 ? 1 - (t - 0.85) / 0.15 : 1;
+
+    if (t < 1) {
+      requestAnimationFrame(animFrame);
+    } else {
+      ball.style.display = 'none';
+      trashCan.classList.remove('open');
+      spawnConfetti(endX, endY);
+    }
+  }
+
+  requestAnimationFrame(animFrame);
+}
+
+function spawnConfetti(x, y) {
+  const colors = ['#f4a261','#2d6a4f','#e63946','#1a1a2e','#ffd166','#06d6a0'];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const angle = (Math.PI * 2 * i) / 14;
+    const dist = 30 + Math.random() * 40;
+    el.style.left = (x + Math.cos(angle) * dist) + 'px';
+    el.style.top = (y + Math.sin(angle) * dist) + 'px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDuration = (0.6 + Math.random() * 0.4) + 's';
+    el.style.animationDelay = (Math.random() * 0.1) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+}
+
+function showFlash(text) {
+  const el = document.createElement('div');
+  el.className = 'result-flash';
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

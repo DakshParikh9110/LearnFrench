@@ -617,8 +617,14 @@
        Two columns are too cramped for "ils/elles" + input + phonetic */
     .conj-grid {
       grid-template-columns: 1fr;
+      grid-template-rows: auto;
       gap: 0;
       margin-bottom: 20px;
+    }
+    /* Override the inline grid-column/row placement set for desktop */
+    .conj-row {
+      grid-column: 1 !important;
+      grid-row: auto !important;
     }
 
     /* Bigger tap targets for inputs */
@@ -858,9 +864,10 @@ function render() {
     <div class="conj-grid">
   `;
 
-  const pairs = [[0,3],[1,4],[2,5]];
-  pairs.forEach(([left, right]) => {
-    [left, right].forEach(i => {
+  // Render in natural order 0-5 (je,tu,il,nous,vous,ils)
+  // CSS grid places them visually as je/nous, tu/vous, il/ils on desktop
+  // On mobile (1-col) they read naturally top-to-bottom
+  [0,1,2,3,4,5].forEach(i => {
       const s = state;
       const isCorrect = s.correct[i];
       const isChecked = s.checked[i];
@@ -873,8 +880,12 @@ function render() {
       else if (isChecked && isCorrect) { cls = 'correct'; icon = '✓'; }
       else if (isChecked && !isCorrect) { cls = 'wrong'; icon = '✗'; }
 
+      // Desktop: col 1 = je(0),tu(1),il(2) | col 2 = nous(3),vous(4),ils(5)
+      const col = i < 3 ? 1 : 2;
+      const row = (i % 3) + 1;
+
       html += `
-        <div class="conj-row">
+        <div class="conj-row" style="grid-column:${col}; grid-row:${row};">
           <span class="pronoun">${PRONOUNS[i]}</span>
           <div class="input-wrap">
             <input 
@@ -893,7 +904,6 @@ function render() {
           <span class="check-icon">${icon}</span>
         </div>
       `;
-    });
   });
 
   html += `</div>
